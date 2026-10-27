@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "extraKnownMarketplaces": {
+    "rusty-arms": { "source": { "source": "github", "repo": "rusty-arms/agent-kit" } }
+  },
+  "enabledPlugins": { "agent-kit@rusty-arms": true },
+  "permissions": {
+    "deny": [
+      "WebFetch(domain:archive.org)",
+      "Read(~/Develop/rusty-arms/ma-lab/**)",
+      "Edit(~/Develop/rusty-arms/ma-lab/**)",
+      "Edit(/.githooks/**)",
+      "Edit(/scripts/check_no_retail.py)",
+      "Edit(/scripts/check_links.py)",
+      "Edit(/.github/workflows/guard.yml)"
+    ]
+  }
+}
