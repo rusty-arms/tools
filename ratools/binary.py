@@ -1,7 +1,8 @@
 """Big-endian binary reading and writing, shared by every format parser.
 
 GameCube data is big-endian. Parsers read with `Reader` and write back with `Writer`, so that a
-round trip (parse, write, compare) uses the same field definitions in both directions.
+round trip (parse, write, compare) uses the same field definitions in both directions. Both take
+`byteorder="<"` for the few formats whose spec allows little-endian data.
 
 Every read is bounds-checked: reading past the end raises `ReadError` with the offset, rather
 than returning short data.
@@ -23,11 +24,21 @@ FORMATS = {
     "f32": "f",
     "f64": "d",
 }
-_STRUCTS = {name: struct.Struct(">" + code) for name, code in FORMATS.items()}
+BYTE_ORDERS = (">", "<")
+_STRUCTS = {
+    order: {name: struct.Struct(order + code) for name, code in FORMATS.items()}
+    for order in BYTE_ORDERS
+}
 
 
 class ReadError(ValueError):
     """The data ended early, or an offset is out of range."""
+
+
+def _structs(byteorder: str) -> dict[str, struct.Struct]:
+    if byteorder not in _STRUCTS:
+        raise ValueError(f"byte order must be '>' or '<', not {byteorder!r}")
+    return _STRUCTS[byteorder]
 
 
 def _check_alignment(alignment: int) -> None:
@@ -36,9 +47,11 @@ def _check_alignment(alignment: int) -> None:
 
 
 class Reader:
-    """Reads big-endian values from `data`, starting at `offset`."""
+    """Reads big-endian values (or little-endian, with `byteorder="<"`) from `data`."""
 
-    def __init__(self, data: bytes, offset: int = 0) -> None:
+    def __init__(self, data: bytes, offset: int = 0, byteorder: str = ">") -> None:
+        self.byteorder = byteorder
+        self._structs = _structs(byteorder)
         self.data = bytes(data)
         self.pos = 0
         self.seek(offset)
@@ -89,10 +102,10 @@ class Reader:
         """A reader over `size` bytes at `offset`, positioned at its own start."""
         if offset < 0 or size < 0 or offset + size > len(self.data):
             raise ReadError(f"{size} bytes at {offset:#x} run past the end at {len(self.data):#x}")
-        return Reader(self.data[offset : offset + size])
+        return Reader(self.data[offset : offset + size], byteorder=self.byteorder)
 
     def read(self, kind: str) -> int | float:
-        packer = _STRUCTS[kind]
+        packer = self._structs[kind]
         if packer.size > self.remaining:
             raise ReadError(f"{kind} at {self.pos:#x}, but only {self.remaining} bytes remain")
         (value,) = packer.unpack_from(self.data, self.pos)
@@ -131,9 +144,14 @@ class Reader:
 
 
 class Writer:
-    """Builds big-endian data. `getvalue()` returns the bytes written so far."""
+    """Builds big-endian data (or little-endian, with `byteorder="<"`).
 
-    def __init__(self) -> None:
+    `getvalue()` returns the bytes written so far.
+    """
+
+    def __init__(self, byteorder: str = ">") -> None:
+        self.byteorder = byteorder
+        self._structs = _structs(byteorder)
         self.buffer = bytearray()
 
     def __len__(self) -> int:
@@ -172,13 +190,13 @@ class Writer:
 
     def patch(self, offset: int, kind: str, value: float) -> None:
         """Overwrite a value already written, such as an offset known only later."""
-        packer = _STRUCTS[kind]
+        packer = self._structs[kind]
         if offset < 0 or offset + packer.size > len(self.buffer):
             raise ValueError(f"{kind} at {offset:#x} is outside the {len(self.buffer)} bytes written")
         packer.pack_into(self.buffer, offset, value)
 
     def write(self, kind: str, value: float) -> None:
-        self.buffer += _STRUCTS[kind].pack(value)
+        self.buffer += self._structs[kind].pack(value)
 
     def u8(self, value: int) -> None:
         self.write("u8", value)

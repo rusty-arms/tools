@@ -91,6 +91,20 @@ class WriterTest(unittest.TestCase):
         writer.u32(0x03040506)
         self.assertEqual(writer.getvalue(), b"\x01\x02\x03\x04\x05\x06")
 
+    def test_little_endian(self):
+        writer = Writer(byteorder="<")
+        writer.u16(0x0102)
+        writer.u32(0x03040506)
+        writer.patch(0, "u16", 0x0A0B)
+        self.assertEqual(writer.getvalue(), b"\x0b\x0a\x06\x05\x04\x03")
+        reader = Reader(writer.getvalue(), byteorder="<")
+        self.assertEqual((reader.u16(), reader.u32()), (0x0A0B, 0x03040506))
+        self.assertEqual(reader.sub(2, 4).u32(), 0x03040506, "a sub-reader keeps the byte order")
+        with self.assertRaises(ValueError):
+            Reader(b"", byteorder="=")
+        with self.assertRaises(ValueError):
+            Writer(byteorder="big")
+
     def test_align_and_zeros(self):
         writer = Writer()
         writer.u8(1)
