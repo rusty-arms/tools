@@ -1,0 +1,6 @@
+# The admins team reviews everything. The round-trip tests are the Phase 1
+# gate, so tests/ is listed explicitly with .github/: changes there need an
+# admin's approval and must never be approved by an agent.
+*          @rusty-arms/admins
+/.github/  @rusty-arms/admins
+/tests/    @rusty-arms/admins
