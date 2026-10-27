@@ -8,11 +8,11 @@ Standard library Python only, 3.11 or later.
 
 ## Status
 
-No format is supported yet. Each one arrives after its spec:
+Each format arrives after its spec:
 
 | Format | Spec | Parser |
 |---|---|---|
-| Main archive | In progress | Not started |
+| MST archive | [mst-archive.md](https://github.com/rusty-arms/specs/blob/main/formats/mst-archive.md) | `ratools/mst.py`: reads, writes and checks; round-trips synthetic archives. Not yet run on the disc |
 
 The Phase 1 exit gate: every entry type round-trips (parse, write, and get the same bytes back), and the level viewer's screenshots match Dolphin's.
 
@@ -35,6 +35,14 @@ CI runs them on Python 3.11 and 3.13, on GitHub-hosted runners. Nothing in CI to
 ## Using the tools on a real disc
 
 You need your own disc and the files extracted from it. The tools read them where they are, and their output stays with them: never commit extracted files, converted assets or screenshots. In this project, the owner runs the tools in the local lab and reports only pass or fail to implementer sessions.
+
+To check an MST archive against its spec, parse it, write it back and compare the bytes:
+
+```sh
+python3 -m ratools.mst check path/to/archive.mst
+```
+
+It prints only counts, offsets and the spec sections that pass or fail, never entry names or data, so its output can be shared. It exits with 0 when every section passes.
 
 ## Contributing
 
