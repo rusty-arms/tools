@@ -1,0 +1,39 @@
+# Retail data must never be committed. Same extensions as scripts/check_no_retail.py, plus *.raw.
+*.iso
+*.gcm
+*.rvz
+*.ciso
+*.wbfs
+*.nkit
+*.dol
+*.rel
+*.mst
+*.bik
+*.gci
+*.sav
+*.dtm
+*.raw
+
+# The lab and anything extracted, captured or dumped from the game.
+lab/
+ma-lab/
+extracted/
+captures/
+dumps/
+
+# Never commit the local handover file.
+HANDOVER.md
+
+# Local Claude Code settings, Python caches and build output.
+.claude/settings.local.json
+__pycache__/
+.venv/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+
+# Tool output, such as viewer screenshots and converted assets, stays in the lab.
+# A synthetic test fixture that must be an image is added with `git add -f`.
+*.png
+out/
