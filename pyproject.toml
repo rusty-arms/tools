@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rusty-arms-tools"
+description = "Parsers, writers and validators for the disc's file formats, written from the Rusty Arms specs."
+readme = "README.md"
+license = { text = "MIT OR Apache-2.0" }
+requires-python = ">=3.11"
+dependencies = []
+dynamic = ["version"]
+
+[tool.setuptools]
+packages = ["ratools"]
+
+[tool.setuptools.dynamic]
+version = { attr = "ratools.__version__" }
