@@ -12,7 +12,7 @@ Each format arrives after its spec:
 
 | Format | Spec | Parser |
 |---|---|---|
-| MST archive | [mst-archive.md](https://github.com/rusty-arms/specs/blob/main/formats/mst-archive.md) | `ratools/mst.py`: reads, writes and checks; round-trips synthetic archives. Not yet run on the disc |
+| MST archive | [mst-archive.md](https://github.com/rusty-arms/specs/blob/main/formats/mst-archive.md) | `ratools/mst.py`: reads, writes and checks; round-trips synthetic archives, and the owner's disc passes `check` (2026-10-28) |
 
 The Phase 1 exit gate: every entry type round-trips (parse, write, and get the same bytes back), and the level viewer's screenshots match Dolphin's.
 
