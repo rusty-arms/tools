@@ -13,6 +13,7 @@ Each format arrives after its spec:
 | Format | Spec | Parser |
 |---|---|---|
 | MST archive | [mst-archive.md](https://github.com/rusty-arms/specs/blob/main/formats/mst-archive.md) | `ratools/mst.py`: reads, writes and checks; round-trips synthetic archives, and the owner's disc passes `check` (2026-10-28) |
+| Binary CSV tables | [binary-csv.md](https://github.com/rusty-arms/specs/blob/main/formats/binary-csv.md) | `ratools/csvtable.py`: reads, writes and checks; rebuilds synthetic tables byte for byte. Not yet run on the disc |
 
 The Phase 1 exit gate: every entry type round-trips (parse, write, and get the same bytes back), and the level viewer's screenshots match Dolphin's.
 
@@ -43,6 +44,14 @@ python3 -m ratools.mst check path/to/archive.mst
 ```
 
 It prints only counts, offsets and the spec sections that pass or fail, never entry names or data, so its output can be shared. It exits with 0 when every section passes.
+
+To check every binary CSV table in an archive the same way:
+
+```sh
+python3 -m ratools.csvtable check path/to/archive.mst
+```
+
+It prints only how many tables fail each spec section, never keys or values.
 
 ## Contributing
 
